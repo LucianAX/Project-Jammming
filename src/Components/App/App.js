@@ -4,7 +4,8 @@ import './App.css';
 import SearchBar from '../SearchBar/SearchBar';
 import SearchResults from '../SearchResults/SearchResults';
 import Playlist from '../Playlist/Playlist';
-//import Spotify from '../../util/Spotify';
+
+import Spotify from '../../util/Spotify';
 
 class App extends React.Component
 {
@@ -12,17 +13,9 @@ class App extends React.Component
         super(props);
     
         this.state = {
-            searchResults: [
-                { name: 'name1', artist: 'artist1', album: 'album1', id: 'id1' },
-                { name: 'name2', artist: 'artist2', album: 'album2', id: 'id2' },
-                { name: 'name3', artist: 'artist3', album: 'album3', id: 'id3' },
-            ],
-            playlistName: 'Big Bad Playlist',
-            playlistTracks: [
-                { name: 'plname1', artist: 'plartist1', album: 'plalbum1', id: 'plid1' },
-                { name: 'plname2', artist: 'plartist2', album: 'plalbum2', id: 'plid2' },
-                { name: 'plname3', artist: 'plartist3', album: 'plalbum3', id: 'plid3' },
-            ],
+            searchResults: [],
+            playlistName: 'New Playlist',
+            playlistTracks: [],
         };
 
         this.addTrack = this.addTrack.bind(this);
@@ -59,11 +52,23 @@ class App extends React.Component
         
         // methods for interaction with the Spotify API
     savePlaylist() {
-        let trackURIs = this.state.playlistTracks.map(track => track.uri);       
+        let trackURIs = this.state.playlistTracks.map(track => track.uri);
+        Spotify.savePlaylist(this.state.playlistName, trackURIs)
+            .then(() => {
+                this.setState({
+                    playlistName: 'New Playlist',
+                    playlistTracks: []
+                });
+            });        
     }
     search(term) {
-        console.log(term);
-        //Spotify.search(term);
+        Spotify.search(term)
+            .then(results => {             
+                this.setState({
+                    searchResults: results
+                });
+                console.log(results);
+            })
     }
 
     render() {
